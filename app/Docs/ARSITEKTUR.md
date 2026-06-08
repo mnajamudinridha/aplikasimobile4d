@@ -104,8 +104,9 @@ plugins {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.7.1'
-    implementation 'com.google.android.material:material:1.14.0'
+    // AndroidX dipatok ke versi yang cocok compileSdk 32 + AGP 7.2.1 (lihat catatan di bawah)
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.google.android.material:material:1.6.1'
 
     // TAMBAH — Firebase via BoM (kelola versi terpusat)
     implementation platform('com.google.firebase:firebase-bom:32.7.0')
@@ -115,14 +116,22 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
 ```
 
 > **Kenapa BoM (Bill of Materials)?** BoM menyamakan versi seluruh pustaka Firebase, jadi
 > `firebase-database` cukup ditulis tanpa nomor versi — BoM yang menentukan. Ini mencegah
 > bentrok versi antar-modul Firebase.
+
+> ⚠️ **Version skew (penting).** `compileSdk`, AGP, dan versi pustaka adalah satu kontrak
+> tiga-arah. Versi terbaru `appcompat` (≥1.5) / `material` (≥1.7) menarik `androidx.core:core:1.16`
+> yang **mewajibkan compileSdk 34 + AGP 8.6+** → build gagal di toolchain ini. Karena proyek
+> dipatok ke **AGP 7.2.1 / compileSdk 32 / JDK 11** (JBR bawaan Android Studio), pustaka AndroidX
+> juga dipatok ke versi seangkatan: `appcompat:1.4.2`, `material:1.6.1`, `test.ext:junit:1.1.5`,
+> `espresso-core:3.5.1`. Firebase BoM 32.7.0 tetap aman (tidak menuntut compileSdk 34).
+> Bila ingin pustaka terbaru, upgrade satu paket: AGP 8.6+ + Gradle 8.7+ + JDK 17 + compileSdk 34 + `namespace`.
 
 ### 4.3 `AndroidManifest.xml` — izin internet & Application
 
