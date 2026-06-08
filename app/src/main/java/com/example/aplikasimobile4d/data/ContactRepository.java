@@ -29,6 +29,12 @@ public class ContactRepository {
         void onError(Exception e);
     }
 
+    /** Callback operasi tulis (create/update/delete). */
+    public interface OnComplete {
+        void onSuccess();
+        void onError(Exception e);
+    }
+
     /** Node koleksi semua kontak: /contacts */
     private final DatabaseReference contactsRef =
             FirebaseDatabase.getInstance().getReference("contacts");
@@ -66,6 +72,25 @@ public class ContactRepository {
             }
         };
         contactsRef.addValueEventListener(listener);
+    }
+
+    /**
+     * CREATE — membuat kontak baru. Membuat <i>push key</i> unik lalu menulis seluruh objek
+     * via {@code setValue()}. Tidak perlu mengabari daftar secara manual: listener realtime
+     * di MainActivity otomatis menerima data baru.
+     */
+    public void create(Contact contact, final OnComplete callback) {
+        String id = contactsRef.push().getKey(); // push key terurut waktu
+        if (id == null) {
+            callback.onError(new IllegalStateException("Gagal membuat id kontak"));
+            return;
+        }
+        long now = System.currentTimeMillis();
+        contact.createdAt = now;
+        contact.updatedAt = now;
+        contactsRef.child(id).setValue(contact)
+                .addOnSuccessListener(unused -> callback.onSuccess())
+                .addOnFailureListener(callback::onError);
     }
 
     /** Melepas listener realtime. Wajib dipanggil saat layar berhenti agar tidak bocor. */
