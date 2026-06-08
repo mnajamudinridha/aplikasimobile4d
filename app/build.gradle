@@ -30,8 +30,11 @@ android {
 
 dependencies {
 
-    implementation 'androidx.appcompat:appcompat:1.7.1'
-    implementation 'com.google.android.material:material:1.14.0'
+    // PENTING: versi AndroidX dipatok ke yang kompatibel dengan compileSdk 32 + AGP 7.2.1.
+    // appcompat >= 1.5 dan material >= 1.7 (mis. 1.7.1 / 1.14.0) menarik androidx.core:core:1.16
+    // yang MEWAJIBKAN compileSdk 34 + AGP 8.6+, sehingga build gagal pada toolchain ini.
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.google.android.material:material:1.6.1'
 
     // Firebase via BoM (Bill of Materials): satu sumber versi untuk semua pustaka Firebase,
     // jadi firebase-database tidak perlu ditulis nomor versinya. BoM 32.7.0 teruji dgn AGP 7.2.1.
@@ -42,6 +45,6 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }

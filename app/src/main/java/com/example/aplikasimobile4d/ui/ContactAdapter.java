@@ -78,7 +78,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
         items.clear();
         items.addAll(newList);
-        result.dispatchUpdatesToAdapter(this);
+        result.dispatchUpdatesTo(this);
     }
 
     @NonNull
