@@ -1,1 +1,4 @@
 /build
+
+# Firebase config (berisi kunci proyek) — tiap dev unduh sendiri dari Firebase Console
+google-services.json
