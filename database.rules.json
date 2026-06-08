@@ -1,0 +1,18 @@
+{
+  "rules": {
+    "contacts": {
+      ".read": true,
+      ".write": true,
+      "$contactId": {
+        ".validate": "newData.hasChildren(['nama'])",
+        "nama":         { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 60" },
+        "nomorTelepon": { ".validate": "newData.isString() && newData.val().length <= 20" },
+        "umur":         { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 150" },
+        "favorit":      { ".validate": "newData.isBoolean()" },
+        "createdAt":    { ".validate": "newData.isNumber()" },
+        "updatedAt":    { ".validate": "newData.isNumber()" },
+        "$other":       { ".validate": false }
+      }
+    }
+  }
+}

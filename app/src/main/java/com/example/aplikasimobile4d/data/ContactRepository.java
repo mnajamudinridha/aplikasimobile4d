@@ -44,6 +44,12 @@ public class ContactRepository {
     /** Disimpan agar bisa dilepas lagi di {@link #removeObserver()}. */
     private ValueEventListener listener;
 
+    public ContactRepository() {
+        // Jaga node /contacts tetap tersinkron walau tak ada listener aktif, sehingga
+        // data terbaru tersedia di cache lokal untuk akses offline (NFR-2).
+        contactsRef.keepSynced(true);
+    }
+
     /**
      * Memasang listener <b>realtime</b>. {@code onDataChange} dipanggil sekarang (data awal)
      * dan setiap kali data di server berubah — inilah inti fitur realtime.
