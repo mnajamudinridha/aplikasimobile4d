@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,6 +31,24 @@ public class MainActivity extends AppCompatActivity {
     private ContactAdapter adapter;
     private TextView textEmpty;
     private View progress;
+
+    /** Aksi per baris dari adapter: tap=ubah, tahan-lama=hapus, tap bintang=toggle favorit. */
+    private final ContactAdapter.OnItemActionListener itemActionListener = new ContactAdapter.OnItemActionListener() {
+        @Override
+        public void onEdit(Contact contact) {
+            bukaForm(contact);
+        }
+
+        @Override
+        public void onDelete(Contact contact) {
+            konfirmasiHapus(contact);
+        }
+
+        @Override
+        public void onToggleFavorit(Contact contact) {
+            repository.toggleFavorit(contact.id, !contact.favorit);
+        }
+    };
 
     /** Callback realtime dari repository. Berjalan di main thread → aman update UI langsung. */
     private final ContactRepository.ContactsCallback callback = new ContactRepository.ContactsCallback() {
@@ -55,17 +75,53 @@ public class MainActivity extends AppCompatActivity {
 
         textEmpty = findViewById(R.id.textEmpty);
         progress = findViewById(R.id.progress);
+        repository = new ContactRepository();
 
         RecyclerView recycler = findViewById(R.id.recyclerContacts);
         recycler.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ContactAdapter();
+        adapter = new ContactAdapter(itemActionListener);
         recycler.setAdapter(adapter);
 
         FloatingActionButton fabAdd = findViewById(R.id.fabAdd);
-        fabAdd.setOnClickListener(v ->
-                startActivity(new Intent(this, AddEditContactActivity.class)));
+        fabAdd.setOnClickListener(v -> bukaForm(null)); // null = mode Tambah
+    }
 
-        repository = new ContactRepository();
+    /** Buka form. {@code contact == null} → mode Tambah; selain itu → mode Ubah (data ter-isi). */
+    private void bukaForm(Contact contact) {
+        Intent intent = new Intent(this, AddEditContactActivity.class);
+        if (contact != null) {
+            intent.putExtra(AddEditContactActivity.EXTRA_ID, contact.id);
+            intent.putExtra(AddEditContactActivity.EXTRA_NAMA, contact.nama);
+            intent.putExtra(AddEditContactActivity.EXTRA_TELEPON, contact.nomorTelepon);
+            intent.putExtra(AddEditContactActivity.EXTRA_UMUR, contact.umur);
+            intent.putExtra(AddEditContactActivity.EXTRA_FAVORIT, contact.favorit);
+            intent.putExtra(AddEditContactActivity.EXTRA_CREATED_AT, contact.createdAt);
+        }
+        startActivity(intent);
+    }
+
+    /** Dialog konfirmasi sebelum menghapus (hard delete). */
+    private void konfirmasiHapus(Contact contact) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.konfirmasi_hapus_judul)
+                .setMessage(getString(R.string.konfirmasi_hapus_pesan, contact.nama))
+                .setPositiveButton(R.string.aksi_hapus, (dialog, which) ->
+                        repository.delete(contact.id, new ContactRepository.OnComplete() {
+                            @Override
+                            public void onSuccess() {
+                                Toast.makeText(MainActivity.this,
+                                        R.string.pesan_dihapus, Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Toast.makeText(MainActivity.this,
+                                        getString(R.string.error_hapus, e.getMessage()),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }))
+                .setNegativeButton(R.string.aksi_batal, null)
+                .show();
     }
 
     @Override
