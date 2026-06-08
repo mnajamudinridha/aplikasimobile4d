@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">AplikasiMobile4D</string>
+    <string name="app_name">Kontak Teman</string>
+
+    <!-- Layar utama -->
+    <string name="empty_kontak">Belum ada kontak.\nTekan tombol + untuk menambah.</string>
+    <string name="error_memuat">Gagal memuat data: %1$s</string>
 </resources>
