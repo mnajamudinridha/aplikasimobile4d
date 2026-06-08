@@ -16,14 +16,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Adapter RecyclerView untuk menampilkan daftar kontak.
+ * Adapter RecyclerView untuk daftar kontak.
  *
- * <p>M1: render baris sederhana (nama, umur, nomor, ikon favorit) dengan
- * {@code notifyDataSetChanged()}. DiffUtil yang lebih efisien menyusul di M4.</p>
+ * <p>M3: setiap baris memancarkan tiga aksi melalui {@link OnItemActionListener}:
+ * tap = ubah, tahan-lama = hapus, tap bintang = toggle favorit. Adapter tidak tahu cara
+ * mengubah/menghapus data — itu urusan Activity + Repository (pemisahan tanggung jawab).</p>
  */
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
 
+    /** Aksi yang bisa dilakukan pada satu baris kontak. */
+    public interface OnItemActionListener {
+        void onEdit(Contact contact);
+        void onDelete(Contact contact);
+        void onToggleFavorit(Contact contact);
+    }
+
     private final List<Contact> items = new ArrayList<>();
+    private final OnItemActionListener listener;
+
+    public ContactAdapter(OnItemActionListener listener) {
+        this.listener = listener;
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     public void setItems(List<Contact> newItems) {
@@ -44,7 +57,15 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
-        holder.bind(items.get(position));
+        Contact contact = items.get(position);
+        holder.bind(contact);
+
+        holder.itemView.setOnClickListener(v -> listener.onEdit(contact));
+        holder.itemView.setOnLongClickListener(v -> {
+            listener.onDelete(contact);
+            return true; // konsumsi event, jangan teruskan
+        });
+        holder.textFavorit.setOnClickListener(v -> listener.onToggleFavorit(contact));
     }
 
     @Override
@@ -54,9 +75,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     static class ContactViewHolder extends RecyclerView.ViewHolder {
 
-        private final TextView textNama;
-        private final TextView textDetail;
-        private final TextView textFavorit;
+        final TextView textNama;
+        final TextView textDetail;
+        final TextView textFavorit;
 
         ContactViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -68,16 +89,14 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         void bind(Contact contact) {
             textNama.setText(contact.nama);
 
-            // Gabungkan umur (int) + nomor (String) menjadi satu baris detail
             StringBuilder detail = new StringBuilder();
             detail.append(contact.umur).append(" thn");
             if (contact.nomorTelepon != null && !contact.nomorTelepon.isEmpty()) {
-                detail.append(" • ").append(contact.nomorTelepon); // • pemisah
+                detail.append(" • ").append(contact.nomorTelepon);
             }
             textDetail.setText(detail.toString());
 
-            // boolean -> bintang penuh/kosong
-            textFavorit.setText(contact.favorit ? "★" : "☆"); // ★ / ☆
+            textFavorit.setText(contact.favorit ? "★" : "☆");
         }
     }
 }

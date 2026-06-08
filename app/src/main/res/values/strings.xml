@@ -8,6 +8,7 @@
 
     <!-- Form tambah/ubah -->
     <string name="judul_tambah">Tambah Kontak</string>
+    <string name="judul_ubah">Ubah Kontak</string>
     <string name="hint_nama">Nama</string>
     <string name="hint_telepon">Nomor Telepon</string>
     <string name="hint_umur">Umur</string>
@@ -17,4 +18,12 @@
     <string name="error_umur_invalid">Umur harus berupa angka</string>
     <string name="pesan_tersimpan">Kontak tersimpan</string>
     <string name="error_simpan">Gagal menyimpan: %1$s</string>
+
+    <!-- Hapus -->
+    <string name="konfirmasi_hapus_judul">Hapus kontak?</string>
+    <string name="konfirmasi_hapus_pesan">Yakin ingin menghapus \"%1$s\"? Tindakan ini tidak bisa dibatalkan.</string>
+    <string name="aksi_hapus">Hapus</string>
+    <string name="aksi_batal">Batal</string>
+    <string name="pesan_dihapus">Kontak dihapus</string>
+    <string name="error_hapus">Gagal menghapus: %1$s</string>
 </resources>

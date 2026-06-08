@@ -11,7 +11,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Satu-satunya kelas yang menyentuh Firebase Realtime Database.
@@ -91,6 +93,40 @@ public class ContactRepository {
         contactsRef.child(id).setValue(contact)
                 .addOnSuccessListener(unused -> callback.onSuccess())
                 .addOnFailureListener(callback::onError);
+    }
+
+    /**
+     * UPDATE — memperbarui kontak yang sudah ada. Memakai {@code updateChildren(toMap())}
+     * (partial update) sehingga hanya field di map yang ditulis. {@code updatedAt} diperbarui;
+     * pemanggil bertanggung jawab mempertahankan {@code createdAt} pada objek.
+     */
+    public void update(Contact contact, final OnComplete callback) {
+        if (contact.id == null) {
+            callback.onError(new IllegalStateException("id kontak null saat update"));
+            return;
+        }
+        contact.updatedAt = System.currentTimeMillis();
+        contactsRef.child(contact.id).updateChildren(contact.toMap())
+                .addOnSuccessListener(unused -> callback.onSuccess())
+                .addOnFailureListener(callback::onError);
+    }
+
+    /** DELETE — menghapus satu kontak (hard delete, keputusan D-3). */
+    public void delete(String id, final OnComplete callback) {
+        contactsRef.child(id).removeValue()
+                .addOnSuccessListener(unused -> callback.onSuccess())
+                .addOnFailureListener(callback::onError);
+    }
+
+    /**
+     * Update field tunggal {@code favorit} (boolean) tanpa menyentuh field lain — contoh
+     * partial update yang paling kecil. Fire-and-forget: perubahan tampil lewat listener realtime.
+     */
+    public void toggleFavorit(String id, boolean nilaiBaru) {
+        Map<String, Object> patch = new HashMap<>();
+        patch.put("favorit", nilaiBaru);
+        patch.put("updatedAt", System.currentTimeMillis());
+        contactsRef.child(id).updateChildren(patch);
     }
 
     /** Melepas listener realtime. Wajib dipanggil saat layar berhenti agar tidak bocor. */
