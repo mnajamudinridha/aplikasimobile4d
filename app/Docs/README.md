@@ -54,7 +54,7 @@ Baca berurutan:
 ## Status
 
 - ✅ **PRD & dokumentasi selesai** (dokumen ini).
-- ⬜ **Implementasi kode** — belum dimulai (ikuti ROADMAP M0).
+- ✅ **Implementasi kode selesai** — milestone M0–M5 (lihat [`README` root](../../README.md)).
 
 ---
 
