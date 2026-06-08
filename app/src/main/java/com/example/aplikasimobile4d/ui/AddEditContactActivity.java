@@ -94,6 +94,10 @@ public class AddEditContactActivity extends AppCompatActivity {
                 layoutUmur.setError(getString(R.string.error_umur_invalid));
                 return;
             }
+            if (umur < 0 || umur > 150) {
+                layoutUmur.setError(getString(R.string.error_umur_range));
+                return;
+            }
         }
         layoutUmur.setError(null);
 

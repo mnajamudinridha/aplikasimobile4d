@@ -2,12 +2,15 @@ package com.example.aplikasimobile4d.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,7 +19,9 @@ import com.example.aplikasimobile4d.data.ContactRepository;
 import com.example.aplikasimobile4d.model.Contact;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Layar utama: menampilkan daftar kontak secara <b>realtime</b>.
@@ -31,6 +36,11 @@ public class MainActivity extends AppCompatActivity {
     private ContactAdapter adapter;
     private TextView textEmpty;
     private View progress;
+
+    /** Sumber data lengkap dari server; daftar yang tampil adalah hasil filter dari sini. */
+    private final List<Contact> allContacts = new ArrayList<>();
+    private String query = "";
+    private boolean favoritOnly = false;
 
     /** Aksi per baris dari adapter: tap=ubah, tahan-lama=hapus, tap bintang=toggle favorit. */
     private final ContactAdapter.OnItemActionListener itemActionListener = new ContactAdapter.OnItemActionListener() {
@@ -55,9 +65,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onData(List<Contact> contacts) {
             progress.setVisibility(View.GONE);
-            adapter.setItems(contacts);
-            textEmpty.setText(R.string.empty_kontak);
-            textEmpty.setVisibility(contacts.isEmpty() ? View.VISIBLE : View.GONE);
+            allContacts.clear();
+            allContacts.addAll(contacts);
+            applyFilter(); // tampilkan sesuai query & filter favorit aktif
         }
 
         @Override
@@ -122,6 +132,69 @@ public class MainActivity extends AppCompatActivity {
                         }))
                 .setNegativeButton(R.string.aksi_batal, null)
                 .show();
+    }
+
+    /**
+     * Menyaring {@link #allContacts} di sisi klien lalu menyerahkannya ke adapter.
+     * Cocokkan {@code nama} (case-insensitive) dengan {@link #query}, dan bila
+     * {@link #favoritOnly} aktif hanya tampilkan yang favorit.
+     */
+    private void applyFilter() {
+        String q = query.trim().toLowerCase(Locale.getDefault());
+        List<Contact> hasil = new ArrayList<>();
+        for (Contact c : allContacts) {
+            boolean cocokNama = q.isEmpty()
+                    || (c.nama != null && c.nama.toLowerCase(Locale.getDefault()).contains(q));
+            boolean cocokFavorit = !favoritOnly || c.favorit;
+            if (cocokNama && cocokFavorit) {
+                hasil.add(c);
+            }
+        }
+        adapter.setItems(hasil);
+
+        if (hasil.isEmpty()) {
+            // Bedakan "memang belum ada data" vs "ada data tapi tak cocok filter"
+            textEmpty.setText(allContacts.isEmpty() ? R.string.empty_kontak : R.string.empty_cari);
+            textEmpty.setVisibility(View.VISIBLE);
+        } else {
+            textEmpty.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setQueryHint(getString(R.string.hint_cari));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String text) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String text) {
+                query = text == null ? "" : text;
+                applyFilter();
+                return true;
+            }
+        });
+
+        menu.findItem(R.id.action_favorit_only).setChecked(favoritOnly);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@androidx.annotation.NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_favorit_only) {
+            favoritOnly = !favoritOnly;
+            item.setChecked(favoritOnly);
+            applyFilter();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
