@@ -1,5 +1,6 @@
 package com.example.aplikasimobile4d.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.aplikasimobile4d.R;
 import com.example.aplikasimobile4d.data.ContactRepository;
 import com.example.aplikasimobile4d.model.Contact;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
@@ -58,6 +60,10 @@ public class MainActivity extends AppCompatActivity {
         recycler.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ContactAdapter();
         recycler.setAdapter(adapter);
+
+        FloatingActionButton fabAdd = findViewById(R.id.fabAdd);
+        fabAdd.setOnClickListener(v ->
+                startActivity(new Intent(this, AddEditContactActivity.class)));
 
         repository = new ContactRepository();
     }

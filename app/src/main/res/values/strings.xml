@@ -4,4 +4,17 @@
     <!-- Layar utama -->
     <string name="empty_kontak">Belum ada kontak.\nTekan tombol + untuk menambah.</string>
     <string name="error_memuat">Gagal memuat data: %1$s</string>
+    <string name="desc_tambah">Tambah kontak</string>
+
+    <!-- Form tambah/ubah -->
+    <string name="judul_tambah">Tambah Kontak</string>
+    <string name="hint_nama">Nama</string>
+    <string name="hint_telepon">Nomor Telepon</string>
+    <string name="hint_umur">Umur</string>
+    <string name="label_favorit">Tandai sebagai favorit</string>
+    <string name="aksi_simpan">Simpan</string>
+    <string name="error_nama_kosong">Nama wajib diisi</string>
+    <string name="error_umur_invalid">Umur harus berupa angka</string>
+    <string name="pesan_tersimpan">Kontak tersimpan</string>
+    <string name="error_simpan">Gagal menyimpan: %1$s</string>
 </resources>
