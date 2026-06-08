@@ -3,8 +3,11 @@
 
     <!-- Layar utama -->
     <string name="empty_kontak">Belum ada kontak.\nTekan tombol + untuk menambah.</string>
+    <string name="empty_cari">Tidak ada kontak yang cocok.</string>
     <string name="error_memuat">Gagal memuat data: %1$s</string>
     <string name="desc_tambah">Tambah kontak</string>
+    <string name="hint_cari">Cari nama…</string>
+    <string name="aksi_favorit_only">Hanya favorit</string>
 
     <!-- Form tambah/ubah -->
     <string name="judul_tambah">Tambah Kontak</string>
@@ -16,6 +19,7 @@
     <string name="aksi_simpan">Simpan</string>
     <string name="error_nama_kosong">Nama wajib diisi</string>
     <string name="error_umur_invalid">Umur harus berupa angka</string>
+    <string name="error_umur_range">Umur harus antara 0–150</string>
     <string name="pesan_tersimpan">Kontak tersimpan</string>
     <string name="error_simpan">Gagal menyimpan: %1$s</string>
 

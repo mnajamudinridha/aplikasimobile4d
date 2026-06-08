@@ -1,12 +1,12 @@
 package com.example.aplikasimobile4d.ui;
 
-import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.aplikasimobile4d.R;
@@ -14,6 +14,7 @@ import com.example.aplikasimobile4d.model.Contact;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Adapter RecyclerView untuk daftar kontak.
@@ -38,13 +39,46 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         this.listener = listener;
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    /**
+     * Mengganti isi daftar memakai {@link DiffUtil} agar hanya baris yang benar-benar berubah
+     * yang digambar ulang (animasi halus, hemat). Bandingkan {@link #areItemsTheSame} pakai id,
+     * {@link #areContentsTheSame} pakai field yang tampil.
+     */
     public void setItems(List<Contact> newItems) {
+        final List<Contact> oldList = new ArrayList<>(items);
+        final List<Contact> newList = newItems == null ? new ArrayList<>() : newItems;
+
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return oldList.size();
+            }
+
+            @Override
+            public int getNewListSize() {
+                return newList.size();
+            }
+
+            @Override
+            public boolean areItemsTheSame(int oldPos, int newPos) {
+                // Identitas baris = id (push key)
+                return Objects.equals(oldList.get(oldPos).id, newList.get(newPos).id);
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldPos, int newPos) {
+                Contact a = oldList.get(oldPos);
+                Contact b = newList.get(newPos);
+                return a.umur == b.umur
+                        && a.favorit == b.favorit
+                        && Objects.equals(a.nama, b.nama)
+                        && Objects.equals(a.nomorTelepon, b.nomorTelepon);
+            }
+        });
+
         items.clear();
-        if (newItems != null) {
-            items.addAll(newItems);
-        }
-        notifyDataSetChanged(); // diganti DiffUtil di M4
+        items.addAll(newList);
+        result.dispatchUpdatesToAdapter(this);
     }
 
     @NonNull

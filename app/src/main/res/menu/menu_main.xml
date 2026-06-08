@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Cari nama (case-insensitive, filter di sisi klien) -->
+    <item
+        android:id="@+id/action_search"
+        android:title="@string/hint_cari"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView" />
+
+    <!-- Toggle tampilkan hanya favorit -->
+    <item
+        android:id="@+id/action_favorit_only"
+        android:checkable="true"
+        android:title="@string/aksi_favorit_only"
+        app:showAsAction="never" />
+
+</menu>
